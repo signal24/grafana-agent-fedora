@@ -32,9 +32,12 @@ jobs:
       run: |
         LATEST_GRAFANA_HASH=$(curl -s https://registry.hub.docker.com/v2/repositories/grafana/agent/tags/latest | jq -r '.images[0].digest')
         BUILD_GRAFANA_HASH=$(sonar labels get signal24/grafana-agent-fedora grafana-agent-image-hash | cut -d' ' -f2)
+        echo Latest Grafana hash: ${LATEST_GRAFANA_HASH}
+        echo Build Grafana hash: ${BUILD_GRAFANA_HASH}
+        
         if [ "$LATEST_GRAFANA_HASH" != "$BUILD_GRAFANA_HASH" ]; then
-          echo "::set-output name=should_build::true"
-          echo "::set-output name=latest_grafana_hash::$LATEST_GRAFANA_HASH"
+          echo "should_build=true" >> $GITHUB_OUTPUT
+          echo "latest_grafana_hash=$LATEST_GRAFANA_HASH" >> $GITHUB_OUTPUT
         fi
 
     - name: Build and push
@@ -44,5 +47,5 @@ jobs:
         context: .
         push: true
         tags: signal24/grafana-agent-fedora:latest
-        labels: |
-          grafana-agent-image-hash=${{ steps.check_version.outputs.latest_grafana_hash }}
+        build-args: |
+          GRAFANA_SRC_HASH=${{ steps.check_version.outputs.latest_grafana_hash }}
