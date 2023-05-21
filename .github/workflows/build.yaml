@@ -1,8 +1,8 @@
 name: Rebuild Grafana Agent Fedora
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # run daily
+#   schedule:
+#     - cron: '0 0 * * *'  # run daily
   workflow_dispatch:
 
 jobs:
